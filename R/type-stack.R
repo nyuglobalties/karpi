@@ -1,3 +1,5 @@
+# Very basic key-value pair stack implementation
+
 kv_stack <- function(type = integer()) {
   stopifnot(is.atomic(type))
 

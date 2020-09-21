@@ -9,3 +9,7 @@
 stop0 <- function(...) {
   stop(..., call. = FALSE)
 }
+
+cat_line <- function(x = NULL, .env = parent.frame()) {
+  cat(glue(x, .envir = .env), "\n", sep = "")
+}
