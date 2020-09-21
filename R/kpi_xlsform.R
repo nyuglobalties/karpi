@@ -26,15 +26,36 @@ kpi_get_xlsform <- function(asset_id, file = NULL, verbose = TRUE) {
   choices <- openxlsx::read.xlsx(file, sheet = "choices")
   settings <- openxlsx::read.xlsx(file, sheet = "settings")
 
+  odk_xlsform(asset_id, survey, choices, settings)
+}
+
+odk_xlsform <- function(asset_id, survey, choices, settings) {
   structure(
     list(
+      id = asset_id,
       survey = survey,
       choices = choices,
       settings = settings
     ),
-
     class = "odk_xlsform"
   )
 }
 
+#' @export
+print.odk_xlsform <- function(x) {
+  cat_line("<ODK XLSForm: '{x$id}'>")
+  cat_line()
 
+  cat_line("Survey:")
+  print(x$survey)
+  cat_line()
+
+  cat_line("Choices:")
+  print(x$choices)
+  cat_line()
+
+  cat_line("Settings:")
+  print(x$settings)
+
+  invisible(x)
+}
