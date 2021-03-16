@@ -8,6 +8,7 @@ fetch_xlsform <- function(asset_id) {
   httr::content(res, as = "raw")
 }
 
+#' @export
 kpi_get_xlsform <- function(asset_id, file = NULL, verbose = TRUE) {
   bytes <- fetch_xlsform(asset_id)
 
@@ -42,7 +43,7 @@ odk_xlsform <- function(asset_id, survey, choices, settings) {
 }
 
 #' @export
-print.odk_xlsform <- function(x) {
+print.odk_xlsform <- function(x, ...) {
   cat_line("<ODK XLSForm: '{x$id}'>")
   cat_line()
 
