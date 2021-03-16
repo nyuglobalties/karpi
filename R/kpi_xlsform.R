@@ -8,6 +8,23 @@ fetch_xlsform <- function(asset_id) {
   httr::content(res, as = "raw")
 }
 
+#' Fetch the XLSForm for a survey with asset ID `asset_id`
+#' 
+#' Downloads the current XLSForm for a survey with ID `asset_id`.
+#' 
+#' @param asset_id The survey's asset ID (found after the "/forms/" in the URL)
+#' @param file If not `NULL`, the path where the XLSForm should be saved
+#' @param verbose If `TRUE`, echos a message where the file was saved
+#' @return An `odk_xlsform` object, a `list()` with `id`, `survey`,
+#'   `choices`, and `settings` entries.
+#' @examples 
+#' \dontrun{
+#'   # Form url is this: https://kf.kobotoolbox.org/#/forms/abcdefghijklmnop
+#'   # Asset ID is: abcdefghijklmnop
+#'   form <- karpi::kpi_get_xlsform("abcdefghijklmnop")
+#'   print(form$survey)
+#'   print(form$choices)
+#' }
 #' @export
 kpi_get_xlsform <- function(asset_id, file = NULL, verbose = TRUE) {
   bytes <- fetch_xlsform(asset_id)
