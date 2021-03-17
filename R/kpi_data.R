@@ -23,6 +23,9 @@ fetch_data <- function(asset_id) {
 #' @param system_vars Which ODK system variables to keep in the downloaded
 #'   dataset, e.g. "_uuid", "_id", and "_version". "_geolocation" is omitted
 #'   for privacy reasons.
+#' @param missing_vars What to do if variables expected in the KoBo XForm meta
+#'   are missing. Defaults to nothing. Usually this is the result of empty
+#'   or unused fields during data collection.
 #' @return A data.frame of the dataset stored as `asset_id` on KoBo
 #' 
 #' @examples 
@@ -37,10 +40,15 @@ kpi_get_data <- function(
   expand_multiple = TRUE,
   expand_delimiter = ".",
   drop_expanded = FALSE,
-  system_vars = "_uuid"
+  system_vars = "_uuid",
+  missing_vars = c("nothing", "warn", "msg", "err")
 ) {
   raw_data <- fetch_data(asset_id)
   meta <- kpi_get_xlsform(asset_id)
+
+  # Action for when missing variables (dropped due to lack
+  # of data) are encountered
+  missing_vars <- match.arg(missing_vars)
 
   # Add group names to variables
   meta <- rename_vars_with_groups(meta)
@@ -49,7 +57,7 @@ kpi_get_data <- function(
   raw_data <- strip_geolocation(raw_data)
 
   # Extract data columns
-  raw_data <- keep_survey_vars(raw_data, meta, system_vars)
+  raw_data <- keep_survey_vars(raw_data, meta, system_vars, missing_vars)
 
   # Bind data
   data <- lapply(raw_data, data.table::as.data.table)
@@ -75,11 +83,27 @@ strip_geolocation <- function(res) {
   })
 }
 
-keep_survey_vars <- function(res, meta, system_vars) {
+keep_survey_vars <- function(res, meta, system_vars, miss_act) {
   stopifnot(inherits(meta, "odk_xlsform"))
 
   meta$survey <- meta$survey[!meta$survey$type %in% c("begin_group", "end_group", "note"), ]
   keep_vars <- c(meta$survey$name, system_vars)
+
+  total_pool <- unlist(lapply(res, names))
+
+  if (!all(keep_vars %in% total_pool)) {
+    vars_not_in_pool <- keep_vars[!keep_vars %in% total_pool]
+    notif <- glue("Missing variables: {vec_view(vars_not_in_pool)}")
+
+    switch(
+      miss_act,
+      msg = message(notif),
+      warn = warn0(notif),
+      err = stop0(notif)
+    )
+
+    keep_vars <- keep_vars[keep_vars %in% total_pool]
+  }
 
   lapply(res, function(r) {
     r[keep_vars]
@@ -98,6 +122,11 @@ expand_multiple_choice <- function(dat, meta, delimiter = ".", drop_cols = FALSE
   survey_df$choice <- gsub("^select_multiple\\s+", "", survey_df$type)
 
   for (col in survey_df$name) {
+    # Presumbly, the missing_vars action is "nothing" here
+    if (!col %in% names(dat)) {
+      next
+    }
+
     choice_id <- survey_df[survey_df$name == col, "choice"]
     choices <- meta$choices[meta$choices$list_name == choice_id, "name"]
 
