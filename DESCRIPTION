@@ -1,11 +1,18 @@
 Package: karpi
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Direct R interface to the KoBo v2 API
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Authors@R:
+    c(person(given = "Patrick",
+             family = "Anker",
+             role = c("aut", "cre"),
+             email = "psanker@nyu.edu",
+             comment = c(ORCID = "0000-0003-2302-0445")),
+      person(given = "Global TIES for Children",
+             role = c("cph")))
+Description: A little utility that interfaces with the KoBo v2 API.
+    Has support of getting data, XLSForms, and general asset info
+    for surveys collected on the KoBo platform.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

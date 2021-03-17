@@ -4,9 +4,19 @@
 \name{karpi-package}
 \alias{karpi}
 \alias{karpi-package}
-\title{karpi: What the Package Does (Title Case)}
+\title{karpi: Direct R interface to the KoBo v2 API}
 \description{
-More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+A little utility that interfaces with the KoBo v2 API.
+    Has support of getting data, XLSForms, and general asset info
+    for surveys collected on the KoBo platform.
+}
+\author{
+\strong{Maintainer}: Patrick Anker \email{psanker@nyu.edu} (\href{https://orcid.org/0000-0003-2302-0445}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Global TIES for Children [copyright holder]
+}
+
 }
 \keyword{internal}
