@@ -8,6 +8,7 @@ kpi_get_data(
   asset_id,
   expand_multiple = TRUE,
   expand_delimiter = ".",
+  drop_expanded = FALSE,
   system_vars = "_uuid"
 )
 }
@@ -20,6 +21,9 @@ field will get its own column. Expanding uses one-hot encoding.}
 \item{expand_delimiter}{The expanded columns follow the pattern
 "[field name][delimiter][choice value]". By default, the delimiter
 is "." in karpi. Other ODK implementations use "/" as a delimiter.}
+
+\item{drop_expanded}{Drops multiple choices columns that were expanded into
+dummies.}
 
 \item{system_vars}{Which ODK system variables to keep in the downloaded
 dataset, e.g. "_uuid", "_id", and "_version". "_geolocation" is omitted

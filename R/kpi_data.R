@@ -18,6 +18,8 @@ fetch_data <- function(asset_id) {
 #' @param expand_delimiter The expanded columns follow the pattern
 #'   "[field name][delimiter][choice value]". By default, the delimiter
 #'   is "." in karpi. Other ODK implementations use "/" as a delimiter.
+#' @param drop_expanded Drops multiple choices columns that were expanded into
+#'   dummies.
 #' @param system_vars Which ODK system variables to keep in the downloaded
 #'   dataset, e.g. "_uuid", "_id", and "_version". "_geolocation" is omitted
 #'   for privacy reasons.
@@ -34,6 +36,7 @@ kpi_get_data <- function(
   asset_id,
   expand_multiple = TRUE,
   expand_delimiter = ".",
+  drop_expanded = FALSE,
   system_vars = "_uuid"
 ) {
   raw_data <- fetch_data(asset_id)
@@ -53,7 +56,12 @@ kpi_get_data <- function(
   data <- as.data.frame(data.table::rbindlist(data, use.names = TRUE, fill = TRUE))
 
   if (isTRUE(expand_multiple)) {
-    expand_multiple_choice(data, meta, delimiter = expand_delimiter)
+    expand_multiple_choice(
+      data,
+      meta,
+      delimiter = expand_delimiter,
+      drop_cols = drop_expanded
+    )
   } else {
     data
   }
@@ -78,7 +86,7 @@ keep_survey_vars <- function(res, meta, system_vars) {
   })
 }
 
-expand_multiple_choice <- function(dat, meta, delimiter = ".") {
+expand_multiple_choice <- function(dat, meta, delimiter = ".", drop_cols = FALSE) {
   survey_df <- meta$survey
 
   survey_df <- survey_df[grepl("^select_multiple", survey_df$type), ]
@@ -93,18 +101,37 @@ expand_multiple_choice <- function(dat, meta, delimiter = ".") {
     choice_id <- survey_df[survey_df$name == col, "choice"]
     choices <- meta$choices[meta$choices$list_name == choice_id, "name"]
 
-    dat[, paste0(col, delimiter, choices)] <- NA_integer_
+    dat <- insert_multiple_choice_dummies(dat, col, choices, delimiter)
 
-    for (choice in choices) {
-      selected <- !is.na(dat[[col]])
-
-      dat[selected, paste0(col, delimiter, choice)] <- as.integer(grepl(choice, dat[selected, col]))
+    if (isTRUE(drop_cols)) {
+      dat[[col]] <- NULL
     }
-
-    dat[[col]] <- NULL
   }
 
   dat
+}
+
+insert_multiple_choice_dummies <- function(dat, col, choices, delim) {
+  pivot <- which(names(dat) == col)
+  before <- names(dat)[1:(pivot - 1)]
+  
+  if (pivot == length(dat)) {
+    after <- NULL
+  } else {
+    after <- names(dat)[(pivot + 1):length(dat)]
+  }
+
+  new_cols <- paste0(col, delim, choices)
+  dat[, new_cols] <- NA_integer_
+
+  for (choice in choices) {
+    new_col <- paste0(col, delim, choice)
+    selected <- !is.na(dat[[col]])
+
+    dat[selected, new_col] <- as.integer(grepl(choice, dat[selected, col]))
+  }
+
+  dat[, c(before, col, new_cols, after)]
 }
 
 rename_vars_with_groups <- function(meta, sep = "/") {
