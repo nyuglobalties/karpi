@@ -9,7 +9,9 @@ kpi_get_data(
   expand_multiple = TRUE,
   expand_delimiter = ".",
   drop_expanded = FALSE,
-  system_vars = "_uuid"
+  include_geolocation = FALSE,
+  system_vars = "_uuid",
+  missing_vars = c("nothing", "warn", "msg", "err")
 )
 }
 \arguments{
@@ -25,9 +27,16 @@ is "." in karpi. Other ODK implementations use "/" as a delimiter.}
 \item{drop_expanded}{Drops multiple choices columns that were expanded into
 dummies.}
 
+\item{include_geolocation}{If \code{TRUE}, keeps "_geolocation" in data. Defaults
+to \code{FALSE}.}
+
 \item{system_vars}{Which ODK system variables to keep in the downloaded
 dataset, e.g. "_uuid", "_id", and "_version". "_geolocation" is omitted
-for privacy reasons.}
+for privacy reasons by default.}
+
+\item{missing_vars}{What to do if variables expected in the KoBo XForm meta
+are missing. Defaults to nothing. Usually this is the result of empty
+or unused fields during data collection.}
 }
 \value{
 A data.frame of the dataset stored as \code{asset_id} on KoBo
@@ -37,8 +46,8 @@ Downloads a survey dataset with ID \code{asset_id} from KoBo.
 }
 \examples{
 \dontrun{
-  # Form url is this: https://kf.kobotoolbox.org/#/forms/abcdefghijklmnop
-  # Asset ID is: abcdefghijklmnop
-  karpi::kpi_get_data("abcdefghijklmnop")
+# Form url is this: https://kf.kobotoolbox.org/#/forms/abcdefghijklmnop
+# Asset ID is: abcdefghijklmnop
+karpi::kpi_get_data("abcdefghijklmnop")
 }
 }
