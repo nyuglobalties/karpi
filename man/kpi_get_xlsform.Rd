@@ -22,10 +22,10 @@ Downloads the current XLSForm for a survey with ID \code{asset_id}.
 }
 \examples{
 \dontrun{
-  # Form url is this: https://kf.kobotoolbox.org/#/forms/abcdefghijklmnop
-  # Asset ID is: abcdefghijklmnop
-  form <- karpi::kpi_get_xlsform("abcdefghijklmnop")
-  print(form$survey)
-  print(form$choices)
+# Form url is this: https://kf.kobotoolbox.org/#/forms/abcdefghijklmnop
+# Asset ID is: abcdefghijklmnop
+form <- karpi::kpi_get_xlsform("abcdefghijklmnop")
+print(form$survey)
+print(form$choices)
 }
 }
