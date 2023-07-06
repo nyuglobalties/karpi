@@ -1,3 +1,7 @@
+# karpi 0.1.3
+
+* Addes `kpi_get_raw_data()` to access raw JSON data for more fine-grain control
+
 # karpi 0.1.2
 
 * Fixes an issue where openxlsx would not create a temporary XLSForm when downloading from Kobo
